@@ -21,7 +21,7 @@ const SignUp = () => {
       const result = await createUser(form.email, form.password, form.username)
       // set global state for context
 
-      router.replace('/home') // redireect to home
+      router.replace('/home') // redirect to home
     } catch (error: any) {
       Alert.alert('Error', error.message);
     } finally {

@@ -22,9 +22,11 @@ const SignIn = () => {
     setIsSubmitting(true);
     try {
       const result = await signIn(form.email, form.password)
+
       // set global state for context
 
       router.replace('/home') // redirect to home
+
     } catch (error: any) {
       Alert.alert('Error', error.message);
     } finally {
