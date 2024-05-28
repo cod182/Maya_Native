@@ -1,18 +1,29 @@
-import { FlatList, Image, Text, View } from 'react-native'
+import { FlatList, Image, RefreshControlBase, RefreshControlComponent, Text, View } from 'react-native'
+import React, { useState } from 'react'
 
-import React from 'react'
+import EmptyState from '@/components/EmptyState'
+import { RefreshControl } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import SearchInput from '@/components/SearchInput'
+import Trending from '@/components/Trending'
 import { images } from '../../constants'
 
 const Home = () => {
+
+  const [refreshing, setRefreshing] = useState(false)
+
+  const onRefresh = async () => {
+    setRefreshing(true); //Recall posts & Videos 
+    setRefreshing(false);
+  }
+
   return (
-    <SafeAreaView className='bg-primary'>
+    <SafeAreaView className='h-full bg-primary'>
       <FlatList
-        data={[{ id: 1 }, { id: 2 }, { id: 3 }]}
-        keyExtractor={item => item.id.toString()}
+        data={[{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }]}
+        keyExtractor={item => item?.id.toString()}
         renderItem={({ item }) => (
-          <Text className='text-3xl text-white'>{item.id}</Text>
+          <Text className='text-3xl text-white'>{item?.id}</Text>
         )}
         ListHeaderComponent={
           () => (
@@ -32,11 +43,15 @@ const Home = () => {
               {/* Latest Videos */}
               <View className='flex-1 w-full pt-5 pb-8'>
                 <Text className='mb-3 text-lg text-gray-100 font-pregular'>Latest Videos</Text>
+                <Trending posts={[{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }] ?? []} />
               </View>
 
             </View>
-          )
+          )}
+        ListEmptyComponent={
+          <EmptyState title='no videos found' subtitle='be the first to upload' />
         }
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       />
     </SafeAreaView>
   )
