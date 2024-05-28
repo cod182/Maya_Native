@@ -1,19 +1,35 @@
-import { Image, ScrollView, Text, View } from 'react-native'
+import { Alert, Image, ScrollView, Text, View } from 'react-native'
+import { Link, router } from 'expo-router';
 import React, { useState } from 'react'
 
 import CustomButton from '@/components/CustomButton';
 import FormField from '@/components/FormField';
-import { Link } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { createUser } from '../../lib/appwrite'
 import { images } from '../../constants'
 
 const SignUp = () => {
 
   const [form, setForm] = useState({ email: '', password: '', username: '' })
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const submit = () => {
+  const submit = async () => {
+    if (!form.username || !form.email || !form.password) {
+      Alert.alert('Error', 'Please fill all fields');
+    }
+    setIsSubmitting(true);
+    try {
+      const result = await createUser(form.email, form.password, form.username)
+      // set global state for context
+
+      router.replace('/home') // redireect to home
+    } catch (error: any) {
+      Alert.alert('Error', error.message);
+    } finally {
+      setIsSubmitting(false);
+    }
 
   }
+
   return (
     <SafeAreaView className='h-full bg-primary'>
       <ScrollView>
@@ -21,14 +37,14 @@ const SignUp = () => {
           <Image source={images.logo} resizeMode='contain' className='w-[115px] h-[35px]' />
           <Text className='mt-10 text-2xl text-white text-semibold font-psemibold'>Sign Up to Maya</Text>
           <FormField
-            title='Username'
+            title='username'
             value={form.username}
-            handleChangeText={(e: string) => setForm({ ...form, email: e })}
+            handleChangeText={(e: string) => setForm({ ...form, username: e })}
             otherStyles='mt-10'
           />
 
           <FormField
-            title='Email'
+            title='email'
             value={form.email}
             handleChangeText={(e: string) => setForm({ ...form, email: e })}
             otherStyles='mt-7'
