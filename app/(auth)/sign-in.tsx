@@ -17,7 +17,7 @@ const SignIn = () => {
   return (
     <SafeAreaView className='h-full bg-primary'>
       <ScrollView>
-        <View className='w-full h-full px-4 my-6 justify-normal'>
+        <View className='w-full min-h-[85vh] px-4 my-6 justify-center'>
           <Image source={images.logo} resizeMode='contain' className='w-[115px] h-[35px]' />
           <Text className='mt-10 text-2xl text-white text-semibold font-psemibold'>Log in to Maya</Text>
           <FormField
