@@ -7,8 +7,10 @@ import FormField from '@/components/FormField';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { createUser } from '../../lib/appwrite'
 import { images } from '../../constants'
+import { useGlobalContext } from '@/context/globalProvider';
 
 const SignUp = () => {
+  const { setUser, setIsLoggedIn } = useGlobalContext();
 
   const [form, setForm] = useState({ email: '', password: '', username: '' })
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -19,7 +21,8 @@ const SignUp = () => {
     setIsSubmitting(true);
     try {
       const result = await createUser(form.email, form.password, form.username)
-      // set global state for context
+      setUser(result);
+      setIsLoggedIn(true)
 
       router.replace('/home') // redirect to home
     } catch (error: any) {
