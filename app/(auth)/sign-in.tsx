@@ -29,7 +29,6 @@ const SignIn = () => {
       const result = await getCurrentUser();
       setUser(result);
       setIsLoggedIn(true);;
-      // set global state for context
 
       router.replace('/home') // redirect to home
 

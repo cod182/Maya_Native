@@ -10,8 +10,10 @@ import Trending from '@/components/Trending'
 import VideoCard from '@/components/VideoCard'
 import { images } from '../../constants'
 import useAppwrite from '@/lib/useAppwrite'
+import { useGlobalContext } from '@/context/globalProvider'
 
 const Home = () => {
+  const { user } = useGlobalContext();
 
   const { data: posts, refetch, isLoading } = useAppwrite(getAllPosts);
   const { data: latestPosts } = useAppwrite(getLatestPosts);
@@ -38,7 +40,7 @@ const Home = () => {
               <View className='flex-row items-start justify-between mb-6'>
                 <View>
                   <Text className='text-sm text-gray-100 font-pmedium'>Welcome back</Text>
-                  <Text className='text-2xl text-white font-psemibold'>Codie</Text>
+                  <Text className='text-2xl text-white font-psemibold'>{user?.username}</Text>
                 </View>
                 <View className='mt-1.5'>
                   <Image source={images.logoSmall} className='h-10 w-9' resizeMode='contain' />
