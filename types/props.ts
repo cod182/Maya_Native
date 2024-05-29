@@ -5,6 +5,7 @@ type Creator = {
 
 type VideoPostProps = {
   $id: any;
+  key: number;
   title: string;
   thumbnail: string;
   prompt: string;
