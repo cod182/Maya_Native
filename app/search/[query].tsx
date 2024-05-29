@@ -1,14 +1,11 @@
-import { Alert, FlatList, Image, ListRenderItemInfo, RefreshControlBase, RefreshControlComponent, Text, View } from 'react-native'
+import { FlatList, ListRenderItemInfo, Text, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { getAllPosts, getLatestPosts, searchPosts } from '@/lib/appwrite'
 
 import EmptyState from '@/components/EmptyState'
-import { RefreshControl } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import SearchInput from '@/components/SearchInput'
-import Trending from '@/components/Trending'
 import VideoCard from '@/components/VideoCard'
-import { images } from '../../constants'
+import { searchPosts } from '@/lib/appwrite'
 import useAppwrite from '@/lib/useAppwrite'
 import { useLocalSearchParams } from 'expo-router'
 
