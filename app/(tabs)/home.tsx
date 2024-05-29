@@ -45,7 +45,7 @@ const Home = () => {
                 </View>
               </View>
 
-              <SearchInput value='' handleChangeText={() => { }} />
+              <SearchInput />
 
               {/* Latest Videos */}
               <View className='flex-1 w-full pt-5 pb-8'>
