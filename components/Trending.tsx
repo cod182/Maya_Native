@@ -2,6 +2,7 @@ import * as Animatable from 'react-native-animatable'
 
 import { FlatList, Image, ImageBackground, Text, TouchableOpacity, View } from 'react-native'
 import React, { useState } from 'react'
+import { ResizeMode, Video } from 'expo-av'
 
 import { icons } from '@/constants';
 
@@ -28,8 +29,8 @@ Animatable.initializeRegistryWithDefinitions({
 });
 
 const TrendingItem = ({ activeItem, item }: TrendingItemProps) => {
-
   const [play, setPlay] = useState(false)
+
   return (
     <Animatable.View
       className='mr-5'
@@ -38,7 +39,22 @@ const TrendingItem = ({ activeItem, item }: TrendingItemProps) => {
     >
       {
         play ?
-          <Text className='text-white'>Playing</Text>
+          <Video
+            source={{
+              uri: item.video
+            }}
+            className='w-52 h-72 rounded-[35px] mt-3 bg-white/10'
+            resizeMode={ResizeMode.CONTAIN}
+            useNativeControls
+            shouldPlay
+            onPlaybackStatusUpdate={
+              status => {
+                if ("didJustFinish" in status && status.didJustFinish) {
+                  setPlay(false)
+                }
+              }
+            }
+          />
           :
           <TouchableOpacity className='relative items-center justify-center' activeOpacity={0.7} onPress={() => setPlay(true)}>
             <ImageBackground source={{ uri: item.thumbnail }} className='w-52 h-72 rounded-[35px] my-5 overflow-hidden shadow-lg shadow-black/40' resizeMode='cover' />
@@ -60,9 +76,7 @@ const Trending: React.FC<VideoCardProps> = ({ latestVideoPosts }) => {
   const [activeItem, setActiveItem] = useState(latestVideoPosts[1])
 
   // Functions
-  type props = {
-    viewableItems: VideoPostProps[];
-  }
+
   const viewableItemsChanged = ({ viewableItems }: { viewableItems: { item: VideoPostProps }[] }) => {
     if (viewableItems.length > 0) {
       setActiveItem(viewableItems[0].item);
