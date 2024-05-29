@@ -1,11 +1,12 @@
 import { FlatList, Image, ListRenderItemInfo, Text, TouchableOpacity, View } from 'react-native'
+import { getUserPosts, signOut } from '@/lib/appwrite'
 
 import EmptyState from '@/components/EmptyState'
 import InfoBox from '@/components/InfoBox'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import VideoCard from '@/components/VideoCard'
-import { getUserPosts } from '@/lib/appwrite'
 import { icons } from '@/constants'
+import { router } from 'expo-router'
 import useAppwrite from '@/lib/useAppwrite'
 import { useGlobalContext } from '@/context/globalProvider'
 
@@ -13,7 +14,12 @@ const Profile = () => {
   const { user, setUser, setIsLoggedIn } = useGlobalContext();
   const { data: posts, refetch } = useAppwrite(() => getUserPosts(user.$id));
 
-  const logout = () => { }
+  const logout = async () => {
+    await signOut();
+    setUser(null);
+    setIsLoggedIn(false);
+    router.replace('/sign-in')
+  }
 
 
 
@@ -27,7 +33,7 @@ const Profile = () => {
         )}
         ListHeaderComponent={
           () => (
-            <View className='items-center justify-center w-full px-4 mt-6 b-12'>
+            <View className='items-center justify-center w-full px-4 mt-6 mb-12'>
               <TouchableOpacity className='items-end w-full mb-10' onPress={logout}>
                 <Image source={icons.logout} resizeMode='contain' className='w-6 h-6' />
               </TouchableOpacity>
