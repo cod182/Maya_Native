@@ -7,9 +7,10 @@ import { icons } from '../constants'
 
 type Props = {
   initialQuery?: string;
+  placeholder?: string;
 }
 
-const SearchInput = ({ initialQuery }: Props) => {
+const SearchInput = ({ initialQuery, placeholder }: Props) => {
   const pathname = usePathname();
 
   const [query, setQuery] = useState(initialQuery || '')
@@ -21,7 +22,7 @@ const SearchInput = ({ initialQuery }: Props) => {
       <TextInput
         className='flex-1 w-full text-base text-white mt-0.5 font-pregular'
         value={query}
-        placeholder='Search for a video'
+        placeholder={placeholder}
         placeholderTextColor='#cdcde0'
         onChangeText={(e) => setQuery(e)}
       />

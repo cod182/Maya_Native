@@ -1,19 +1,41 @@
 import { Image, Text, View } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { ResizeMode, Video } from 'expo-av';
 
 import { TouchableOpacity } from 'react-native';
+import { bookmarkPost } from '@/lib/appwrite';
 import { icons } from '@/constants';
+import { useGlobalContext } from '@/context/globalProvider';
 
 type VideoCardProps = {
   post: VideoPostProps;
 };
 
 const VideoCard: React.FC<VideoCardProps> = ({ post }) => {
-  const { title, thumbnail, video, creator } = post;
-  const { username, avatar } = creator;
+  // Destructure post
+  const { title, thumbnail, video, creator, $id, bookmarked_by } = post;
+  const { user } = useGlobalContext();
 
-  const [play, setPlay] = useState(false)
+  // Functions
+
+  const checkIfBookmarked = () => {
+    let hasBookmarked = bookmarked_by.includes(user.$id)
+    if (hasBookmarked) {
+      setBookmarked(true);
+    } else {
+      setBookmarked(false);
+    }
+  }
+
+  // States
+  const { username, avatar } = creator;
+  const [play, setPlay] = useState(false);
+  const [bookmarked, setBookmarked] = useState(false);
+  // useEffects 
+
+  useEffect(() => {
+    checkIfBookmarked();
+  }, [])
 
   return (
     <View className='flex-col items-center px-4 mb-14'>
@@ -29,7 +51,15 @@ const VideoCard: React.FC<VideoCardProps> = ({ post }) => {
           </View>
         </View>
         <View className='pt-2'>
-          <Image source={icons.menu} className='w-5 h-5' resizeMode='contain' />
+          <TouchableOpacity activeOpacity={0.7} onPress={
+            () => {
+              bookmarkPost(bookmarked ? 'remove' : 'add', user.$id, $id, bookmarked_by);
+              setBookmarked(!bookmarked)
+            }
+          }>
+            <Image source={bookmarked ? icons.bookmark : icons.plus} className={`w-5 h-5 `} resizeMode='contain' />
+
+          </TouchableOpacity>
         </View>
       </View>
 

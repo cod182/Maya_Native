@@ -11,4 +11,5 @@ type VideoPostProps = {
   prompt: string;
   video: string;
   creator: Creator;
+  bookmarked_by: Array<string>;
 }
