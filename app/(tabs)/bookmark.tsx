@@ -1,28 +1,75 @@
-import { FlatList, ListRenderItemInfo, RefreshControl, ScrollView, Text, View } from 'react-native'
-import React, { useState } from 'react'
+import { ActivityIndicator, FlatList, ListRenderItemInfo, RefreshControl, ScrollView, Text, View } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import { getPost, getUserBookmarks } from '@/lib/appwrite'
 
 import EmptyState from '@/components/EmptyState'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import SearchInput from '@/components/SearchInput'
 import VideoCard from '@/components/VideoCard'
-import { getUserBookmarks } from '@/lib/appwrite'
 import useAppwrite from '@/lib/useAppwrite'
 import { useGlobalContext } from '@/context/globalProvider'
 
 const bookmark = () => {
+  //Destructuring
   const { user } = useGlobalContext();
   const { data: bookmarks, refetch } = useAppwrite(() => getUserBookmarks(user.$id));
 
-  const [refreshing, setRefreshing] = useState(false)
+
+  // States
+  const [refreshing, setRefreshing] = useState(false);
+  const [videos, setVideos] = useState<any[]>();
+  const [loading, setLoading] = useState(false);
+
+  // Functions
+
+  const getVideos = async () => {
+    setRefreshing(true); //Recall posts & Videos 
+    let videoArray: VideoPostProps[] = [];
+
+    const videoPromises = bookmarks.map(async ({ videoId }: any) => {
+      const video = await getPost(videoId.$id);
+      return video;
+    });
+
+    // Wait for all promises to resolve
+    videoArray = await Promise.all(videoPromises);
+    videoArray.sort((a, b) => {
+      const dateA = new Date(a.$createdAt).getTime();
+      const dateB = new Date(b.$createdAt).getTime();
+      return dateA - dateB; // Sorting in descending order (newest first)
+    });
+
+    setVideos(videoArray);;
+    setRefreshing(false); //Recall posts & Videos 
+
+    return videoArray;
+  };
+
   const onRefresh = async () => {
     setRefreshing(true); //Recall posts & Videos 
     await refetch();
     setRefreshing(false);
   }
+
+  // UseEffects
+  useEffect(() => {
+    getVideos();
+  }, [bookmarks])
+
+  if (loading) {
+    return (
+      <SafeAreaView className='h-full bg-primary'>
+        <View className='items-center justify-center bg-primary/30'>
+          <ActivityIndicator size="large" className='text-secondary' />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView className='h-full bg-primary'>
       <FlatList
-        data={bookmarks}
+        data={videos}
         keyExtractor={(item) => item.$id}
         renderItem={({ item }: ListRenderItemInfo<VideoPostProps>) => (
           <VideoCard post={item} />

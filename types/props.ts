@@ -12,4 +12,5 @@ type VideoPostProps = {
   video: string;
   creator: Creator;
   bookmarked_by: Array<string>;
+  $createdAt: Date;
 }
