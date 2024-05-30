@@ -13,7 +13,6 @@ const bookmark = () => {
   const { user } = useGlobalContext();
   const { data: bookmarks, refetch } = useAppwrite(() => getUserBookmarks(user.$id));
 
-  console.log(bookmark);
   const [refreshing, setRefreshing] = useState(false)
   const onRefresh = async () => {
     setRefreshing(true); //Recall posts & Videos 
