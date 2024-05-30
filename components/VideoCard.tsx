@@ -1,9 +1,9 @@
 import { Image, Text, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { ResizeMode, Video } from 'expo-av';
+import { bookmarkPost, getBookmarksForVideo, getUserBookmarkForVideo } from '@/lib/appwrite';
 
 import { TouchableOpacity } from 'react-native';
-import { bookmarkPost } from '@/lib/appwrite';
 import { icons } from '@/constants';
 import { useGlobalContext } from '@/context/globalProvider';
 
@@ -18,19 +18,25 @@ const VideoCard: React.FC<VideoCardProps> = ({ post }) => {
 
   // Functions
 
-  const checkIfBookmarked = () => {
-    let hasBookmarked = bookmarked_by.includes(user.$id)
-    if (hasBookmarked) {
+  const checkIfBookmarked = async () => {
+    let hasBookmarked = await getUserBookmarkForVideo($id, user.$id)
+    if (hasBookmarked.length === 1) {
       setBookmarked(true);
     } else {
       setBookmarked(false);
     }
   }
 
+  const checkNumberOfBookmarks = async () => {
+    const numberofBookmarks = await getBookmarksForVideo($id);
+    setBookmarks(numberofBookmarks.length)
+  }
+
   // States
   const { username, avatar } = creator;
   const [play, setPlay] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
+  const [bookmarks, setBookmarks] = useState(0)
   // useEffects 
 
   useEffect(() => {
@@ -50,11 +56,15 @@ const VideoCard: React.FC<VideoCardProps> = ({ post }) => {
 
           </View>
         </View>
-        <View className='pt-2'>
+        <View className='flex-row items-center justify-center h-full pt-2'>
+          {bookmarks >= 1 && (
+            <Text className='mr-2 text-white font-psemibold'>{bookmarks}</Text>
+          )}
           <TouchableOpacity activeOpacity={0.7} onPress={
-            () => {
-              bookmarkPost(bookmarked ? 'remove' : 'add', user.$id, $id, bookmarked_by);
-              setBookmarked(!bookmarked)
+            async () => {
+              await bookmarkPost(bookmarked ? 'remove' : 'add', user.$id, $id);
+              setBookmarked(!bookmarked);
+              checkNumberOfBookmarks();
             }
           }>
             <Image source={bookmarked ? icons.bookmark : icons.plus} className={`w-5 h-5 `} resizeMode='contain' />
