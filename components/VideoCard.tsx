@@ -1,4 +1,4 @@
-import { Image, Text, View } from 'react-native'
+import { ActivityIndicator, Image, Pressable, Text, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { ResizeMode, Video } from 'expo-av';
 import { bookmarkPost, getBookmarksForVideo, getUserBookmarkForVideo } from '@/lib/appwrite';
@@ -32,15 +32,28 @@ const VideoCard: React.FC<VideoCardProps> = ({ post }) => {
     setBookmarks(numberofBookmarks.length)
   }
 
+  const bookmarkCurrentPost = async () => {
+    setBookmarking(true);
+    const confirmed = await bookmarkPost(bookmarked ? 'remove' : 'add', user.$id, $id);
+    if (confirmed) {
+      setBookmarked(!bookmarked);
+      checkNumberOfBookmarks();
+    }
+    setBookmarking(false);
+
+  }
+
   // States
   const { username, avatar } = creator;
   const [play, setPlay] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
   const [bookmarks, setBookmarks] = useState(0)
+  const [bookmarking, setBookmarking] = useState(false);
   // useEffects 
 
   useEffect(() => {
     checkIfBookmarked();
+    checkNumberOfBookmarks();
   }, [])
 
   return (
@@ -56,48 +69,54 @@ const VideoCard: React.FC<VideoCardProps> = ({ post }) => {
 
           </View>
         </View>
+
         <View className='flex-row items-center justify-center h-full pt-2'>
+
           {bookmarks >= 1 && (
             <Text className='mr-2 text-white font-psemibold'>{bookmarks}</Text>
           )}
-          <TouchableOpacity activeOpacity={0.7} onPress={
-            async () => {
-              await bookmarkPost(bookmarked ? 'remove' : 'add', user.$id, $id);
-              setBookmarked(!bookmarked);
-              checkNumberOfBookmarks();
-            }
-          }>
-            <Image source={bookmarked ? icons.bookmark : icons.plus} className={`w-5 h-5 `} resizeMode='contain' />
 
-          </TouchableOpacity>
+          {bookmarking ?
+            <ActivityIndicator size="small" className='text-secondary' />
+            :
+            <Pressable onPress={() => bookmarkCurrentPost()}>
+              <Image source={bookmarked ? icons.bookmark : icons.plus} className={`w-5 h-5 `} resizeMode='contain' />
+            </Pressable>
+          }
+
+
+
+
         </View>
       </View>
 
-      {play ? (
-        <Video
-          source={{
-            uri: video
-          }}
-          className='w-full mt-3 h-60 rounded-xl'
-          resizeMode={ResizeMode.CONTAIN}
-          useNativeControls
-          shouldPlay
-          onPlaybackStatusUpdate={
-            status => {
-              if ("didJustFinish" in status && status.didJustFinish) {
-                setPlay(false)
+      {
+        play ? (
+          <Video
+            source={{
+              uri: video
+            }}
+            className='w-full mt-3 h-60 rounded-xl'
+            resizeMode={ResizeMode.CONTAIN}
+            useNativeControls
+            shouldPlay
+            onPlaybackStatusUpdate={
+              status => {
+                if ("didJustFinish" in status && status.didJustFinish) {
+                  setPlay(false)
+                }
               }
             }
-          }
-        />
-      ) : (
-        <TouchableOpacity className='relative items-center justify-center w-full mt-3 h-60 rounded-xl' activeOpacity={0.7} onPress={() => setPlay(true)}>
-          <Image source={{ uri: thumbnail }} className='w-full h-full mt-3 rounded-cl' resizeMode='cover' />
-          <Image source={icons.play} className='absolute w-12 h-12' resizeMode='contain' />
-        </TouchableOpacity>
-      )}
+          />
+        ) : (
+          <TouchableOpacity className='relative items-center justify-center w-full mt-3 h-60 rounded-xl' activeOpacity={0.7} onPress={() => setPlay(true)}>
+            <Image source={{ uri: thumbnail }} className='w-full h-full mt-3 rounded-cl' resizeMode='cover' />
+            <Image source={icons.play} className='absolute w-12 h-12' resizeMode='contain' />
+          </TouchableOpacity>
+        )
+      }
 
-    </View>
+    </View >
   )
 }
 

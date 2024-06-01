@@ -18,11 +18,12 @@ const bookmark = () => {
   // States
   const [refreshing, setRefreshing] = useState(false);
   const [videos, setVideos] = useState<any[]>();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   // Functions
 
   const getVideos = async () => {
+    setLoading(true);
     setRefreshing(true); //Recall posts & Videos 
     let videoArray: VideoPostProps[] = [];
 
@@ -41,6 +42,7 @@ const bookmark = () => {
 
     setVideos(videoArray);;
     setRefreshing(false); //Recall posts & Videos 
+    setLoading(false);
 
     return videoArray;
   };
@@ -56,15 +58,7 @@ const bookmark = () => {
     getVideos();
   }, [bookmarks])
 
-  if (loading) {
-    return (
-      <SafeAreaView className='h-full bg-primary'>
-        <View className='items-center justify-center bg-primary/30'>
-          <ActivityIndicator size="large" className='text-secondary' />
-        </View>
-      </SafeAreaView>
-    );
-  }
+
 
   return (
     <SafeAreaView className='h-full bg-primary'>
@@ -85,7 +79,15 @@ const bookmark = () => {
             </View>
           )}
         ListEmptyComponent={
-          <EmptyState title={`You haven't saved any posts`} subtitle='Why not create a video?' />
+          !loading ? (
+            <EmptyState title={`You haven't saved any posts`} subtitle='Why not create a video?' />
+          )
+            :
+            (
+              <View className='items-center justify-center bg-primary/30'>
+                <ActivityIndicator size="large" className='text-secondary' />
+              </View>
+            )
         }
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
 
